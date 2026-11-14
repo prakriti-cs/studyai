@@ -11,6 +11,8 @@ from backend.resource_recommender.resource_recommender import recommend_resource
 from backend.learning_path.learning_path import generate_learning_path, fastest_route
 
 app = Flask(__name__)
+from backend.planning_routes import planning_api
+app.register_blueprint(planning_api)
 
 
 @app.after_request
