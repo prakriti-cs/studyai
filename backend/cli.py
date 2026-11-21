@@ -70,6 +70,24 @@ def run_dbms_profile(days=dbms.DEFAULTS["days"], hours_per_day=dbms.DEFAULTS["ho
     ))
 
 
+def print_doubt_answer(result):
+    if result["status"] != "success":
+        print(f"\n{result['message']}")
+        suggestions = result.get("did_you_mean")
+        if suggestions:
+            print("Try asking about " + ", ".join(suggestions) + ".")
+        return
+
+    print(f"\n{result['topic']}\n\n{result['answer']}")
+    if "confidence" in result:
+        label = result["confidence"]["label"].capitalize()
+        print(f"\nMatched question — {result['question']}")
+        print(f"Match confidence — {label} (text similarity {result['similarity_score']:g} out of 1)")
+        print("This score measures how closely your wording matches the saved question.")
+    else:
+        print(f"\nSource — Wikipedia\nRead more — {result['link']}")
+
+
 def print_focus_plan(result):
     print(f"\nStudy for {result['study_minutes']} minutes, then take a {result['break_minutes']}-minute break.")
     print("\nWhy this plan?")
@@ -96,7 +114,7 @@ COMMANDS = {
         Field("query", "Question"),
         Field("subject", "Subject (optional)", default=None),
         Field("use_web", "Allow a Wikipedia lookup (yes/no)", yes_no, True),
-    )),
+    ), display=print_doubt_answer),
     "recommend": Command("Resource Recommender", recommend_resources, (
         Field("query", "Topic or search query"),
         Field("level", "Level (optional)", default=None),

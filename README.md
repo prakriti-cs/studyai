@@ -61,7 +61,7 @@ printf '%s\n' '{"fatigue":8,"workload":7}' | python3 -m backend focus --input -
 python3 -m backend revision-schedule --input revision.json
 ```
 
-The interactive Focus Optimizer shows the study and break times first, then explains the ratings, matching rules, and their influence on the recommendation. Use `focus --input` to get the full JSON result for scripts. Most other commands print JSON results, and the DBMS syllabus command prints its study report. The Flask API is still available if you need it.
+The interactive Doubt Assistant leads with the answer and identifies the saved question it matched or the Wikipedia source it used. Its match score describes how closely the question's wording matches the saved entry. The interactive Focus Optimizer leads with the study and break times and explains the rules behind them. Both return structured JSON when run with `--input`. The DBMS syllabus command prints its study report, and the Flask API remains available.
 
 ```bash
 python3 backend/app.py

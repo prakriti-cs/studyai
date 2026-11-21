@@ -21,8 +21,20 @@ KNOWLEDGE_BASE = [
         "topic": "BFS",
         "question": "What is Breadth First Search?",
         "keywords": "BFS breadth first search graph traversal queue level",
-        "answer": "Breadth First Search is a graph traversal algorithm "
-                  "that explores nodes level by level. It uses a queue."
+        "answer": "Breadth-first search (BFS) explores a graph one level at a time. "
+                  "It visits the starting node first, then nodes one step away, "
+                  "then nodes two steps away.\n\n"
+                  "How it works\n"
+                  "Put the starting node in a queue. Take the node at the front, "
+                  "then add each unseen neighbor to the back. Mark nodes as seen "
+                  "as soon as you add them so they enter the queue only once.\n\n"
+                  "Example\n"
+                  "A connects to B and C, and B connects to D. Start at A and "
+                  "add B before C. After visiting A, the queue holds B and C. "
+                  "Visiting B adds D behind C, so the visit order is A → B → C → D.\n\n"
+                  "Why it matters\n"
+                  "In an unweighted graph, BFS finds paths with the fewest edges "
+                  "from the starting node. D is two edges from A in this example."
     },
     {
         "subject": "AI",
