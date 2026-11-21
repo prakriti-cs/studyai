@@ -6,12 +6,12 @@ import math
 import sys
 from datetime import date
 from pathlib import Path
-from typing import Callable, NamedTuple
+from typing import Callable, NamedTuple, Optional
 
 from backend.deadline_manager.deadline_manager import manage_deadlines
 from backend.doubt_assistant.doubt_assistant import answer_doubt
 from backend.exam_profiles import dbms
-from backend.focus_optimizer.focus_optimizer import optimize_break
+from backend.focus_optimizer.focus_optimizer import SHORT_SESSION_FATIGUE, optimize_break
 from backend.goal_tracker.goal_tracker import track_goal
 from backend.learning_path.learning_path import fastest_route, generate_learning_path
 from backend.readiness_evaluator.readiness_evaluator import evaluate_readiness
@@ -35,6 +35,7 @@ class Command(NamedTuple):
     run: Callable
     fields: tuple
     rows: tuple = ()
+    display: Optional[Callable] = None
 
 
 def number(value):
@@ -69,6 +70,25 @@ def run_dbms_profile(days=dbms.DEFAULTS["days"], hours_per_day=dbms.DEFAULTS["ho
     ))
 
 
+def print_focus_plan(result):
+    print(f"\nStudy for {result['study_minutes']} minutes, then take a {result['break_minutes']}-minute break.")
+    print("\nWhy this plan?")
+    for key in ("fatigue", "workload"):
+        levels = " to ".join(
+            level.lower() for level, strength in result[f"{key}_memberships"].items() if strength > 0
+        )
+        print(f"  {key.capitalize()} {result[key]:g}/10 falls in the {levels} range.")
+    if result["fatigue"] >= SHORT_SESSION_FATIGUE:
+        print(f"  A fatigue rating of {SHORT_SESSION_FATIGUE}/10 or higher calls for a shorter study session.")
+    else:
+        print(f"  Fatigue is below {SHORT_SESSION_FATIGUE}/10, so the standard study session applies.")
+
+    print("\nBreak rules that matched")
+    for rule in result["rules_fired"]:
+        print(f"  - {rule['rule']} (match weight {rule['strength']:g})")
+    print("  The break length is an average of these suggestions. Stronger matches count more.")
+
+
 TOPIC_FIELDS = (Field("mastery", "Current mastery (0–1)", number, 0.5),
                 Field("exam_weight", "Relative exam weight", number, 1.0))
 COMMANDS = {
@@ -101,7 +121,7 @@ COMMANDS = {
     "focus": Command("Focus Optimizer", optimize_break, (
         Field("fatigue", "Fatigue (0–10)", number),
         Field("workload", "Workload (0–10)", number),
-    )),
+    ), display=print_focus_plan),
     "goals": Command("Goal Tracker", track_goal, (
         Field("goal", "Study goal"),
         Field("total_topics", "Total topics", int),
@@ -183,7 +203,9 @@ def run_command(command, source=None):
     try:
         payload = prompt_inputs(command) if source is None else load_input(source)
         result = command.run(**payload)
-        if result is not None:
+        if source is None and command.display is not None:
+            command.display(result)
+        elif result is not None:
             print(json.dumps(result, ensure_ascii=False, indent=2))
     except (OSError, ValueError, TypeError, KeyError) as exc:
         print(f"{command.label}: {exc}", file=sys.stderr)
