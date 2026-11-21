@@ -61,7 +61,7 @@ printf '%s\n' '{"fatigue":8,"workload":7}' | python3 -m backend focus --input -
 python3 -m backend revision-schedule --input revision.json
 ```
 
-Terminal commands print JSON results. The DBMS syllabus command prints its existing study report. The Flask API is still available if you need it.
+The interactive Focus Optimizer shows the study and break times first, then explains the ratings, matching rules, and their influence on the recommendation. Use `focus --input` to get the full JSON result for scripts. Most other commands print JSON results, and the DBMS syllabus command prints its study report. The Flask API is still available if you need it.
 
 ```bash
 python3 backend/app.py

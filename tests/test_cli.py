@@ -52,6 +52,21 @@ class TerminalTests(unittest.TestCase):
         self.assertEqual(output, "")
         self.assertIn("input must be a JSON object", errors)
 
+    def test_focus_menu_explains_the_plan_without_printing_json(self):
+        code, output, errors = self.run_cli([], "6\n8\n7\n0\n")
+        self.assertEqual(code, 0, errors)
+        self.assertIn("Study for 25 minutes, then take a 20-minute break.", output)
+        self.assertIn("Workload 7/10 falls in the medium to high range.", output)
+        self.assertIn("Stronger matches count more.", output)
+        self.assertNotIn('"fatigue_memberships"', output)
+
+    def test_focus_json_preserves_the_recommendation_and_rules(self):
+        code, output, errors = self.run_cli(["focus", "--input", "-"], '{"fatigue":8,"workload":7}')
+        self.assertEqual(code, 0, errors)
+        result = json.loads(output)
+        self.assertEqual((result["study_minutes"], result["break_minutes"]), (25, 20))
+        self.assertEqual(len(result["rules_fired"]), 2)
+
     def test_bad_dbms_mastery_does_not_close_the_menu(self):
         code, output, errors = self.run_cli([], "dbms\n\n\n\ninvalid\n0\n")
         self.assertEqual(code, 0)

@@ -1,6 +1,9 @@
 """Explainable zero-dependency Sugeno fuzzy break recommender."""
 
 
+SHORT_SESSION_FATIGUE = 7
+
+
 def triangle(x, a, b, c):
     if not a <= b <= c:
         raise ValueError('triangle coordinates must be ordered')
@@ -43,7 +46,7 @@ def optimize_break(fatigue, workload):
     return {'fatigue': fatigue, 'workload': workload,
             'fatigue_memberships': f, 'workload_memberships': w,
             'break_minutes': round(weighted / strength_sum),
-            'study_minutes': 25 if fatigue >= 7 else 45,
+            'study_minutes': 25 if fatigue >= SHORT_SESSION_FATIGUE else 45,
             'inference': 'Sugeno weighted average with minimum AND', 'rules_fired': fired}
 
 
