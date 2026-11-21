@@ -66,6 +66,8 @@ DEFAULTS = {
     'exam_noise': 0.07,
     'improvement': 0.2,
     'target_retention': 0.75,
+    'simulations': 4000,
+    'seed': 7,
     'block_minutes': 30,
     'risk_aversion': 0.35,
     'max_hours_per_topic': 3.0,
@@ -85,7 +87,7 @@ def build_topics(start, mastery_overrides=None):
     overrides = {}
     for item in mastery_overrides or []:
         if '=' not in item:
-            raise SystemExit(f"Bad --mastery value {item!r}; expected 'Topic Name=0.7'")
+            raise ValueError(f"Bad mastery value {item!r}; expected 'Topic Name=0.7'")
         name, value = item.split('=', 1)
         overrides[name.strip().lower()] = float(value)
     counts = _unit_topic_counts()
@@ -206,11 +208,15 @@ def main():
     parser.add_argument('--hours-per-day', type=float, default=DEFAULTS['hours_per_day'])
     parser.add_argument('--pass-mark', type=float, default=DEFAULTS['pass_mark'])
     parser.add_argument('--target-retention', type=float, default=DEFAULTS['target_retention'])
-    parser.add_argument('--simulations', type=int, default=4000)
-    parser.add_argument('--seed', type=int, default=7)
+    parser.add_argument('--simulations', type=int, default=DEFAULTS['simulations'])
+    parser.add_argument('--seed', type=int, default=DEFAULTS['seed'])
     parser.add_argument('--mastery', nargs='*', metavar='NAME=VALUE',
                         help="override assumed mastery, e.g. --mastery 'Relational Algebra=0.7'")
-    run(parser.parse_args())
+    args = parser.parse_args()
+    try:
+        run(args)
+    except ValueError as exc:
+        parser.error(str(exc))
 
 
 if __name__ == '__main__':
