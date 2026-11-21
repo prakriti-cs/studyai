@@ -52,6 +52,28 @@ class TerminalTests(unittest.TestCase):
         self.assertEqual(output, "")
         self.assertIn("input must be a JSON object", errors)
 
+    def test_doubt_menu_explains_bfs_and_what_the_match_score_means(self):
+        code, output, errors = self.run_cli([], "1\nWhat is BFS?\n\nno\n0\n")
+        self.assertEqual(code, 0, errors)
+        self.assertIn("A → B → C → D", output)
+        self.assertIn("Match confidence — Medium", output)
+        self.assertIn("how closely your wording matches the saved question", output)
+        self.assertNotIn('"similarity_score"', output)
+
+    def test_doubt_shows_the_wikipedia_source_for_a_fallback_answer(self):
+        summary = {"title": "Example topic", "answer": "An example summary.", "link": "https://example.org/topic"}
+        with patch("backend.doubt_assistant.doubt_assistant.wikipedia_summary", return_value=summary):
+            code, output, errors = self.run_cli(["doubt"], "zzzzzzqxy\n\nyes\n")
+        self.assertEqual(code, 0, errors)
+        self.assertIn("Source — Wikipedia", output)
+        self.assertIn(summary["link"], output)
+
+    def test_doubt_offers_suggestions_when_no_answer_matches(self):
+        code, output, errors = self.run_cli(["doubt"], "zzzzzzqxy\n\nno\n")
+        self.assertEqual(code, 0, errors)
+        self.assertIn("could not find a relevant answer", output)
+        self.assertIn("Try asking about", output)
+
     def test_focus_menu_explains_the_plan_without_printing_json(self):
         code, output, errors = self.run_cli([], "6\n8\n7\n0\n")
         self.assertEqual(code, 0, errors)
