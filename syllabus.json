@@ -1,0 +1,16 @@
+{
+  "available_hours_per_day": 3,
+  "start_date": "2026-11-17",
+  "subjects": [{
+    "name": "Artificial Intelligence",
+    "exam_date": "2026-12-10",
+    "units": ["Introduction", "Problem Solving", "Knowledge Representation"],
+    "topics": [
+      {"name": "Introduction to AI", "difficulty": 2, "importance": 3, "estimated_hours": 2},
+      {"name": "Intelligent Agents", "difficulty": 3, "importance": 4, "estimated_hours": 2,
+       "prerequisites": ["Introduction to AI"]},
+      {"name": "Search Algorithms", "difficulty": 4, "importance": 5, "estimated_hours": 3,
+       "prerequisites": ["Intelligent Agents"]}
+    ]
+  }]
+}
