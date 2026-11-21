@@ -2,10 +2,13 @@
 
 ```
 AI-Study-Planner/
-├── frontend/
 ├── backend/
+│   ├── __main__.py and cli.py  Interactive terminal menu and direct commands
 │   ├── doubt_assistant/       doubt_assistant.py        answer_doubt(query, subject=None)
 │   ├── resource_recommender/  resource_recommender.py   recommend_resources(query, level=None, top_n=3)
+│   ├── deadline_manager/     Assignment priorities and workload advice
+│   ├── focus_optimizer/      Study session and break recommendations
+│   ├── goal_tracker/          Study goal progress and daily pace
 │   ├── revision_scheduler/    revision_scheduler.py     build_revision_schedule(topics, ...)   beam search
 │   ├── readiness_evaluator/   readiness_evaluator.py    evaluate_readiness(topics, ...)        Bayesian + Monte Carlo
 │   ├── time_allocator/        time_allocator.py         allocate_study_time(topics, ...)       expected utility
@@ -25,17 +28,43 @@ AI-Study-Planner/
 └── README.md
 ```
 
-## Setup and run (from the AI-Study-Planner folder)
+## Run StudyAI in the terminal
 
+From the repository root, install the dependencies and open the menu.
+
+```bash
+python3 -m pip install -r backend/requirements.txt
+python3 -m backend
 ```
-pip install -r backend/requirements.txt
-python -m backend.doubt_assistant.doubt_assistant
-python -m backend.resource_recommender.resource_recommender
-python -m backend.learning_path.learning_path
-python -m backend.revision_scheduler.revision_scheduler
-python -m backend.readiness_evaluator.readiness_evaluator
-python -m backend.time_allocator.time_allocator
-python backend/app.py
+
+The menu prompts you for the inputs and returns to the feature list after each run. It runs locally without a Flask server. The Doubt Assistant can look up a topic on Wikipedia if you allow it, and the Resource Recommender can search YouTube for unfamiliar topics.
+
+| Command | Feature |
+| --- | --- |
+| `doubt` | Answer a study question |
+| `recommend` | Find learning resources |
+| `learning-path` | Build a prerequisite-based learning path |
+| `route` | Find the fastest route between two topics |
+| `deadlines` | Prioritize assignments by deadline |
+| `focus` | Recommend a study session or break |
+| `goals` | Check progress toward a study goal |
+| `revision-schedule` | Plan review sessions across multiple days |
+| `readiness` | Estimate exam readiness |
+| `allocate-time` | Divide study hours among topics |
+| `dbms` | Run all three exam planners with the built-in DBMS syllabus |
+
+Add a command name to skip the menu. Use `--input` with a JSON file or `-` for standard input to run without prompts. JSON keys match the feature function's parameters. For example, the Doubt Assistant uses `query`.
+
+```bash
+python3 -m backend learning-path
+printf '%s\n' '{"fatigue":8,"workload":7}' | python3 -m backend focus --input -
+python3 -m backend revision-schedule --input revision.json
+```
+
+Terminal commands print JSON results. The DBMS syllabus command prints its existing study report. The Flask API is still available if you need it.
+
+```bash
+python3 backend/app.py
 ```
 
 ## How each module works
